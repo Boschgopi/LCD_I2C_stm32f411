@@ -54,25 +54,25 @@ fn main() -> ! {
     // Already done earlier for the I2C module
     // 2) Configure/Define TX pin
     // Use PA2 as it is connected to the host serial interface
-    let gpioa = dp.GPIOA.split();
-    let tx_pin = gpioa.pa2.into_alternate();
+    //let gpioa = dp.GPIOA.split();
+    //let tx_pin = gpioa.pa2.into_alternate();
     // 3) Configure Serial peripheral channel
     // We're going to use USART2 since its pins are the ones connected to the USART host interface
     // To configure/instantiate the serial peripheral channel we have two options:
     // Use the device peripheral handle to directly access USART2 and instantiate a transmitter instance
-    let _tx:stm32f4xx_hal::serial::Tx<stm32f4xx_hal::pac::USART2> = dp
-        .USART2
-        .tx(
-            tx_pin,
-            Config::default()
-                .baudrate(9600.bps())
-                .wordlength_8()
-                .parity_none(),
-            &clocks,
-        )
-        .unwrap();
+    //let _tx:stm32f4xx_hal::serial::Tx<stm32f4xx_hal::pac::USART2> = dp
+    //    .USART2
+    //    .tx(
+    //        tx_pin,
+    //        Config::default()
+    //            .baudrate(9600.bps())
+    //            .wordlength_8()
+    //            .parity_none(),
+    //        &clocks,
+    //    )
+    //    .unwrap();
 
-    let mut delay = dp.TIM1.delay_ms(&clocks);
+      let mut delay = dp.TIM1.delay_ms(&clocks);
 
     // PCF8574 I2C Address
     const PCF8574_ADDR: u8 = 0x20;    
