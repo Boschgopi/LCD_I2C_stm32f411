@@ -11,7 +11,7 @@ use stm32f4xx_hal::{
     prelude::*,
     serial::{config::Config, SerialExt},
 };
-
+use defmt_rtt;
 #[entry]
 fn main() -> ! {
     // Setup handler for device peripherals
@@ -47,35 +47,32 @@ fn main() -> ! {
     //         frequency: 300.kHz(),
     //     },
     //     &clocks,
-    // );
+    // );.
 
-    // Serial config steps:
-    // 1) Need to configure the system clocks
-    // Already done earlier for the I2C module
-    // 2) Configure/Define TX pin
-    // Use PA2 as it is connected to the host serial interface
-    //let gpioa = dp.GPIOA.split();
-    //let tx_pin = gpioa.pa2.into_alternate();
-    // 3) Configure Serial peripheral channel
-    // We're going to use USART2 since its pins are the ones connected to the USART host interface
-    // To configure/instantiate the serial peripheral channel we have two options:
-    // Use the device peripheral handle to directly access USART2 and instantiate a transmitter instance
-    //let _tx:stm32f4xx_hal::serial::Tx<stm32f4xx_hal::pac::USART2> = dp
-    //    .USART2
-    //    .tx(
-    //        tx_pin,
-    //        Config::default()
-    //            .baudrate(9600.bps())
-    //            .wordlength_8()
-    //            .parity_none(),
-    //        &clocks,
-    //    )
-    //    .unwrap();
 
-      let mut delay = dp.TIM1.delay_ms(&clocks);
 
     // PCF8574 I2C Address
-    const PCF8574_ADDR: u8 = 0x20;    
+    const PCF8574_ADDR: u8 = 0x27;    
+    let output_config: u8 = 0x00;
+    let rs_pin_mask: u8 = 0b00000001;
+    const RS: u8 = 0x01;
+    const RW: u8 = 0x02;
+    const EN_MASK: u8 = 0x04;
+    const D4: u8 = 0x10;
+    const D5: u8 = 0x20;
+    const D6: u8 = 0x40;
+    const D7: u8 = 0x80;
+    i2c.write(PCF8574_ADDR, &[!rs_pin_mask]).unwrap();
+    i2c.write(PCF8574_ADDR, &[EN_MASK]).unwrap();
+
+
+
+
+    let mut delay = dp.TIM1.delay_ms(&clocks);
+  
+
+//RS => 1, characters
+//RS => 0, numbeers
 
     // Application Loop
     loop {
@@ -83,19 +80,50 @@ fn main() -> ! {
         // Each bit of the data byte corresponds to a pin on the PCF8574.
         // Set a bit to 0 to configure the corresponding pin as an output.
         // In this example, all pins are set as outputs, so we set the data byte to 0x00.
-        let output_config: u8 = 0x00;
-        i2c.write(PCF8574_ADDR, &[output_config]).unwrap();
+        i2c.write(PCF8574_ADDR, &[rs_pin_mask]).unwrap();
+        defmt::println!("check-1");
+        
+        // i2c.write(PCF8574_ADDR, &[output_config]).unwrap();
+        defmt::println!("check-2");
         delay.delay_ms(1000_u32); // Wait for 1 second
 
         // Toggle all pins of the PCF8574
         // To toggle the pins, we first read the current state of the GPIO pins,
         // then complement the bits (1s to 0s and 0s to 1s) and write back the new state.
-        let mut input_buffer: [u8; 1] = [0];
+        let mut input_buffer=[0;1];
+        defmt::println!("check-3");
         i2c.read(PCF8574_ADDR, &mut input_buffer).unwrap();
+
+        defmt::println!("{:x}",input_buffer);
+
         let current_state = input_buffer[0];
         let new_state = !current_state;
         i2c.write(PCF8574_ADDR, &[new_state]).unwrap();
         delay.delay_ms(1000_u32); // Wait for 1 second
+
+        let init_commands: [u8; 5] = [0x00, 0x38, 0x00, 0x06, 0x0C];
+        i2c.write(PCF8574_ADDR, &init_commands).unwrap();
+    
+
+        let clear_display: [u8; 2] = [0x00, 0x01];
+        i2c.write(PCF8574_ADDR, &clear_display).unwrap();
+        defmt::println!("check 4- GOPI");
+        // Your name "Santosh"
+        let name: [u8; 12] = [0x40, b'S', b'a', b'n', b't', b'o', b's', b'h',b' ',b' ',b'i',b's'];
+    
+        // Send your name to the LCD
+        i2c.write(PCF8574_ADDR, &name).unwrap();
+
+        // Set cursor to the second row
+        let set_cursor_row2: [u8; 2] = [0x00, 0xC0];
+        i2c.write(PCF8574_ADDR, &set_cursor_row2).unwrap();
+        defmt::println!("check 5- vemula naga gopi");
+        // Display text on the second row
+        let text_row2: [u8; 9] = [0x40, b'I', b'n', b'n', b'o', b'c', b'e', b'n',b't'];
+        i2c.write(PCF8574_ADDR, &text_row2).unwrap();
+        defmt::println!("finish");
     }
 }
+
+
 

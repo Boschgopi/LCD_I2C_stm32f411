@@ -248,6 +248,7 @@ version = "0.1.0"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
+ "defmt",
  "defmt-rtt",
  "embedded-hal 0.2.7",
  "nb 1.1.0",

@@ -1,3 +1,0 @@
-cargo:rustc-link-search=/home/gopi/lcddisplay/lcd/LCD_I2C_stm32f411/target/debug/build/stm32f4-76f02ef1e9752b4a/out
-cargo:rerun-if-changed=src/stm32f411/device.x
-cargo:rerun-if-changed=build.rs
