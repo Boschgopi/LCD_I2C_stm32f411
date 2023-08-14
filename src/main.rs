@@ -62,7 +62,7 @@ fn main() -> ! {
     const D5: u8 = 0x20;
     const D6: u8 = 0x40;
     const D7: u8 = 0x80;
-    i2c.write(PCF8574_ADDR, &[!rs_pin_mask]).unwrap();
+    // i2c.write(PCF8574_ADDR, &[rs_pin_mask]).unwrap();
     i2c.write(PCF8574_ADDR, &[EN_MASK]).unwrap();
 
 
@@ -109,7 +109,7 @@ fn main() -> ! {
         i2c.write(PCF8574_ADDR, &clear_display).unwrap();
         defmt::println!("check 4- GOPI");
         // Your name "Santosh"
-        let name: [u8; 12] = [0x40, b'S', b'a', b'n', b't', b'o', b's', b'h',b' ',b' ',b'i',b's'];
+        let name: [u8; 12] = [0x40, b'S', b'a',  b'n', b't', b'o', b's', b'h',b' ',b' ',b'i',b's'];
     
         // Send your name to the LCD
         i2c.write(PCF8574_ADDR, &name).unwrap();
